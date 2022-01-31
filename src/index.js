@@ -1,8 +1,24 @@
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((reg) => console.log("Registered SW", reg))
-      .catch((err) => console.log("Registration failed", err));
-  });
-}
+import { Workbox } from "workbox-window";
+
+const registerServiceWorker = () => {
+  if ("production" !== process.env.NODE_ENV) {
+    return;
+  }
+
+  if ("serviceWorker" in navigator) {
+    const wb = new Workbox("sw.js");
+
+    wb.addEventListener("installed", (event) => {
+      console.log("installed");
+      if (event.isUpdate) {
+        if (confirm("App updated. Click Ok ")) {
+          window.location.reload();
+        }
+      }
+    });
+
+    wb.register();
+  }
+};
+
+registerServiceWorker();
